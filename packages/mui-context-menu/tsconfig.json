@@ -1,0 +1,29 @@
+// file: tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "noEmit": true
+  },
+  "include": [
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    ".eslintrc.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages/**/node_modules",
+    "dist",
+    "packages/**/dist"
+  ]
+}

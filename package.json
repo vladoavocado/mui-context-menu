@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/mui-context-menu",
+    "packages/example"
+  ]
+}
