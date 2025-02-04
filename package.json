@@ -3,5 +3,6 @@
   "workspaces": [
     "packages/mui-context-menu",
     "packages/example"
-  ]
+  ],
+  "version": "1.0.0"
 }
