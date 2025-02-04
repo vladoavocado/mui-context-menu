@@ -1,97 +1,148 @@
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { MenuItem, Menu as BaseMenu, Stack, Typography } from '@mui/material';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { MenuItemProps } from '../../types';
+import { useRef, useState, MouseEvent } from 'react';
+import { Menu as BaseMenu, SxProps } from '@mui/material';
+import { MenuItemProps, ShrunkMenuProps } from '../../types';
+import { IconText } from '../IconText';
+import { MenuItem } from '../MenuItem';
 
 type MenuProps = {
   items: MenuItemProps[];
-  parentIndex: number;
+  parentIndex: string;
   menuAnchorEl?: HTMLElement | null;
-  onClose(): void;
+  menuProps?: ShrunkMenuProps | null;
+  onAddRef?: (ref: HTMLElement) => void;
+  onClose?: () => void;
+  sx?: SxProps;
 };
 
-export function Menu({ items, menuAnchorEl, parentIndex }: MenuProps) {
-  const [anchorItemRef, setAnchorItemRef] = useState<HTMLElement | null>(null);
-  // const [trackedItemsAnchors] = useState<HTMLElement[]>([]);
-  const onLocalClose = useCallback(() => {
-    setAnchorItemRef(null);
-  }, []);
+export function Menu({
+  items,
+  onClose,
+  onAddRef,
+  menuProps,
+  menuAnchorEl,
+  parentIndex,
+  sx,
+}: MenuProps) {
+  const [openSubmenus, setOpenSubmenus] = useState<
+    Record<string, HTMLElement | null>
+  >({});
 
-  useEffect(() => {
-    const onClose = (event: MouseEvent) => {
-      // Do nothing if the target is not connected element with document
-      if (!event.target) {
-        return;
-      }
+  const anchorTimeouts = useRef<Record<string, NodeJS.Timeout | null>>({});
 
-      const isOutsideMenu = !menuAnchorEl?.contains(event.target as Node);
+  const closeMenu = (id: string) => {
+    anchorTimeouts.current[id] = setTimeout(() => {
+      setOpenSubmenus(prevState => ({
+        ...prevState,
+        [id]: null,
+      }));
 
-      if (isOutsideMenu) {
-        setAnchorItemRef(null);
-      }
-    };
+      anchorTimeouts.current[id] = null;
+    }, 600);
+  };
 
-    document.addEventListener('click', onClose);
+  const openMenu = (id: string, event: MouseEvent<HTMLElement>) => {
+    if (anchorTimeouts[id]) {
+      clearTimeout(anchorTimeouts.current[id]!);
+      anchorTimeouts.current[id] = null;
+    }
 
-    return () => {
-      document.removeEventListener('click', onClose);
-    };
-  }, []);
+    setOpenSubmenus({
+      [id]: event!.currentTarget,
+    });
+  };
 
   return (
     <BaseMenu
+      ref={ref => {
+        if (ref) {
+          onAddRef?.(ref);
+        }
+      }}
       open={Boolean(menuAnchorEl)}
       anchorEl={menuAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
+      anchorOrigin={
+        menuProps?.anchorOrigin ?? {
+          vertical: 'top',
+          horizontal: 'left',
+        }
+      }
+      transformOrigin={
+        menuProps?.transformOrigin ?? {
+          vertical: 'top',
+          horizontal: 'right',
+        }
+      }
+      sx={{
+        padding: '1em',
+        pointerEvents: 'none',
+
+        '& .MuiList-root': {
+          p: 0,
+        },
+        ...sx,
       }}
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
+      disableAutoFocus
+      disableEnforceFocus
+      onMouseLeave={() => {
+        if (!openSubmenus[parentIndex]) {
+          onClose?.();
+        }
       }}
-      sx={{ padding: '1em' }}
     >
-      {items.map(({ text, children }, index) => (
-        <MenuItem
-          key={`${parentIndex ? `${parentIndex}-` : ''}${index}`}
-          sx={{
-            width: '100%',
-          }}
-          // selected={hoveredField === fieldName}
-          onMouseEnter={event => {
-            // Open submenu
-            setAnchorItemRef(event.currentTarget);
-          }}
-          onMouseLeave={() => {
-            // Close submenu or a menu
-            setAnchorItemRef(null);
-          }}
-        >
-          {typeof text === 'string' ? (
-            <Stack
-              flexDirection='row'
-              gap={2}
-              justifyContent='space-between'
-              sx={{ width: '100%' }}
+      {items.map(
+        (
+          {
+            text,
+            children,
+            textProps,
+            highlight,
+            startAdornment,
+            endAdornment,
+          },
+          index,
+        ) => {
+          const id = `${parentIndex}-${index}`;
+
+          return (
+            <MenuItem
+              key={id}
+              highlight={highlight}
+              isHighlighted={Boolean(openSubmenus[id] && items.length > 1)}
+              isTextComponent={typeof text === 'string'}
+              onMouseEnter={event => openMenu(id, event)}
+              onMouseLeave={() => {
+                if (openSubmenus[id] && children) {
+                  closeMenu(id);
+                }
+              }}
             >
-              <Typography>{text}</Typography>
-              <ChevronRightIcon />
-            </Stack>
-          ) : (
-            text
-          )}
-          {children && (
-            <Menu
-              items={children}
-              menuAnchorEl={anchorItemRef}
-              parentIndex={index}
-              onClose={onLocalClose}
-            />
-          )}
-        </MenuItem>
-      ))}
+              <IconText
+                text={text}
+                hasChildren={(children?.length ?? 0) >= 1}
+                textProps={textProps}
+                startAdornment={startAdornment}
+                endAdornment={endAdornment}
+              />
+              {children && (
+                <Menu
+                  items={children}
+                  menuAnchorEl={openSubmenus[id]}
+                  parentIndex={id}
+                  onAddRef={onAddRef}
+                  sx={{
+                    pointerEvents: 'none',
+
+                    '& .MuiMenuItem-root': {
+                      pointerEvents: 'auto',
+                    },
+                  }}
+                />
+              )}
+            </MenuItem>
+          );
+        },
+      )}
     </BaseMenu>
   );
 }

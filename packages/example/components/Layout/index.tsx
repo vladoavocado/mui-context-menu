@@ -10,6 +10,7 @@ export function Layout({ children }: LayoutProps) {
     <Box
       sx={({ palette }) => ({
         background: palette.background.layout,
+        minHeight: '100vh',
         height: '100%',
         width: '100%',
         display: 'flex',
