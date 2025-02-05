@@ -2,6 +2,7 @@ import * as React from 'react';
 import { MouseEventHandler, ReactNode } from 'react';
 import { alpha } from '@mui/material/styles';
 import { Box } from '@mui/material';
+import { BaseMenuItemProps } from '../../types';
 
 type MenuItemProps = {
   onMouseEnter: MouseEventHandler<HTMLElement>;
@@ -10,7 +11,7 @@ type MenuItemProps = {
   isTextComponent?: boolean;
   highlight?: boolean;
   children?: ReactNode;
-};
+} & BaseMenuItemProps;
 
 export function MenuItem({
   onMouseEnter,
@@ -19,10 +20,14 @@ export function MenuItem({
   isTextComponent,
   highlight = true,
   children,
+  ...props
 }: MenuItemProps) {
+  console.log({ props });
+
   return (
     <Box
-      sx={({ palette }) => ({
+      {...props}
+      sx={[({ palette }) => ({
         px: 2,
         py: 1,
         width: '100%',
@@ -39,7 +44,7 @@ export function MenuItem({
               : 'transparent',
           cursor: 'default',
         },
-      })}
+      }), ...(Array.isArray(props.sx) ? props.sx : [props.sx])]}
       onClick={event => event.preventDefault()}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

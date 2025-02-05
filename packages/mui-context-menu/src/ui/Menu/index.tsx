@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { useRef, useState, MouseEvent } from 'react';
+import { useRef, useState, MouseEvent, MouseEventHandler } from 'react';
 import { Menu as BaseMenu, SxProps } from '@mui/material';
-import { MenuItemProps, ShrunkMenuProps } from '../../types';
+import { BaseMenuItemProps, MenuItemProps, ShrunkMenuProps } from '../../types';
 import { IconText } from '../IconText';
 import { MenuItem } from '../MenuItem';
 
@@ -10,6 +10,7 @@ type MenuProps = {
   parentIndex: string;
   menuAnchorEl?: HTMLElement | null;
   menuProps?: ShrunkMenuProps | null;
+  menuItemProps?: BaseMenuItemProps | null;
   onAddRef?: (ref: HTMLElement) => void;
   onClose?: () => void;
   sx?: SxProps;
@@ -21,6 +22,7 @@ export function Menu({
   onAddRef,
   menuProps,
   menuAnchorEl,
+  menuItemProps,
   parentIndex,
   sx,
 }: MenuProps) {
@@ -103,19 +105,22 @@ export function Menu({
           index,
         ) => {
           const id = `${parentIndex}-${index}`;
+          const onMouseEnter: MouseEventHandler<HTMLElement> = (event) => openMenu(id, event);
+          const onMouseLeave: MouseEventHandler<HTMLElement> = () => {
+            if (openSubmenus[id] && children) {
+              closeMenu(id);
+            }
+          };
 
           return (
             <MenuItem
+              {...menuItemProps}
               key={id}
               highlight={highlight}
               isHighlighted={Boolean(openSubmenus[id] && items.length > 1)}
               isTextComponent={typeof text === 'string'}
-              onMouseEnter={event => openMenu(id, event)}
-              onMouseLeave={() => {
-                if (openSubmenus[id] && children) {
-                  closeMenu(id);
-                }
-              }}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
             >
               <IconText
                 text={text}

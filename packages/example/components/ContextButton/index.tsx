@@ -72,6 +72,11 @@ export function ContextButton() {
       ],
       [],
     ),
+    menuItemProps: {
+      sx: {
+        minWidth: '15em',
+      }
+    },
     anchorRef: buttonAnchorEl,
   });
 

@@ -1,10 +1,11 @@
 import { createContext } from 'react';
-import { MenuAnchorRef, MenuItemProps, ShrunkMenuProps } from '../types';
+import { MenuAnchorRef, BaseMenuItemProps, MenuItemProps, ShrunkMenuProps } from '../types';
 
 export type MUIContextMenuProps = {
   setItems(items: MenuItemProps[]): void;
   setMenuAnchorRef(ref: MenuAnchorRef): void;
   setMenuProps(props: ShrunkMenuProps): void;
+  setMenuItemProps(props: BaseMenuItemProps | null): void;
   menuAnchorEl: HTMLElement | null;
 };
 
@@ -19,5 +20,6 @@ export const MUIContextMenu = createContext<MUIContextMenuProps>({
   setItems: noop,
   setMenuAnchorRef: noop,
   setMenuProps: noop,
+  setMenuItemProps: noop,
   menuAnchorEl: null,
 });
