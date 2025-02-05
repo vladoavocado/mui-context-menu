@@ -22,7 +22,6 @@ export function MenuItem({
   children,
   ...props
 }: MenuItemProps) {
-  console.log({ props });
 
   return (
     <Box
@@ -45,7 +44,6 @@ export function MenuItem({
           cursor: 'default',
         },
       }), ...(Array.isArray(props.sx) ? props.sx : [props.sx])]}
-      onClick={event => event.preventDefault()}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >

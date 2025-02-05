@@ -65,8 +65,8 @@ export function Menu({
       anchorEl={menuAnchorEl}
       anchorOrigin={
         menuProps?.anchorOrigin ?? {
-          vertical: 'top',
-          horizontal: 'left',
+          vertical: 'center',
+          horizontal: 'center',
         }
       }
       transformOrigin={
