@@ -31,21 +31,15 @@ var useMUIContextMenu = function useMUIContextMenu(_ref) {
     setMenuAnchorRef = _useContext.setMenuAnchorRef,
     setMenuProps = _useContext.setMenuProps,
     setMenuItemProps = _useContext.setMenuItemProps;
-  React.useEffect(function () {
-    setItems(items);
-  }, [items]);
-  React.useEffect(function () {
-    if (menuProps) {
-      setMenuProps(menuProps);
-    }
-  }, [menuProps]);
-  React.useEffect(function () {
-    if (menuItemProps) {
-      setMenuItemProps(menuItemProps);
-    }
-  }, [menuItemProps]);
   return {
     show: function show() {
+      setItems(items);
+      if (menuItemProps) {
+        setMenuItemProps(menuItemProps);
+      }
+      if (menuProps) {
+        setMenuProps(menuProps);
+      }
       setMenuAnchorRef(anchorRef);
     },
     hide: function hide() {

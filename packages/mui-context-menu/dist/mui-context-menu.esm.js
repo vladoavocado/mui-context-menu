@@ -25,21 +25,15 @@ var useMUIContextMenu = function useMUIContextMenu(_ref) {
     setMenuAnchorRef = _useContext.setMenuAnchorRef,
     setMenuProps = _useContext.setMenuProps,
     setMenuItemProps = _useContext.setMenuItemProps;
-  useEffect(function () {
-    setItems(items);
-  }, [items]);
-  useEffect(function () {
-    if (menuProps) {
-      setMenuProps(menuProps);
-    }
-  }, [menuProps]);
-  useEffect(function () {
-    if (menuItemProps) {
-      setMenuItemProps(menuItemProps);
-    }
-  }, [menuItemProps]);
   return {
     show: function show() {
+      setItems(items);
+      if (menuItemProps) {
+        setMenuItemProps(menuItemProps);
+      }
+      if (menuProps) {
+        setMenuProps(menuProps);
+      }
       setMenuAnchorRef(anchorRef);
     },
     hide: function hide() {
