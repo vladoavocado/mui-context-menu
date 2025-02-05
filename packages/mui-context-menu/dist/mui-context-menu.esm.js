@@ -162,7 +162,7 @@ function Menu(_ref) {
         return _extends({}, prevState, (_extends2 = {}, _extends2[id] = null, _extends2));
       });
       anchorTimeouts.current[id] = null;
-    }, 600);
+    }, 300);
   };
   var openMenu = function openMenu(id, event) {
     var _setOpenSubmenus;
@@ -234,7 +234,7 @@ function Menu(_ref) {
       endAdornment: endAdornment
     }), children && createElement(Menu, {
       items: children,
-      menuAnchorEl: openSubmenus[id],
+      menuAnchorEl: menuAnchorEl ? openSubmenus[id] : undefined,
       parentIndex: id,
       onAddRef: onAddRef,
       menuItemProps: menuItemProps,
