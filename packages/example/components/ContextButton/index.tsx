@@ -1,0 +1,91 @@
+import * as React from 'react';
+import {
+  Button,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  Typography,
+} from '@mui/material';
+import { useMUIContextMenu } from '@vladoavocado/mui-context-menu';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+
+function FormContext() {
+  const [value, setValue] = useState('female');
+
+  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
+  }, []);
+
+  return (
+    <FormControl onClick={event => event.stopPropagation()}>
+      <FormLabel id='demo-controlled-radio-buttons-group'>Gender</FormLabel>
+      <RadioGroup
+        aria-labelledby='demo-controlled-radio-buttons-group'
+        name='controlled-radio-buttons-group'
+        value={value}
+        onChange={handleChange}
+      >
+        <FormControlLabel value='female' control={<Radio />} label='Female' />
+        <FormControlLabel value='male' control={<Radio />} label='Male' />
+      </RadioGroup>
+    </FormControl>
+  );
+}
+
+export function ContextButton() {
+  const [buttonAnchorEl, setButtonAnchorEl] = useState<HTMLElement | null>(
+    null,
+  );
+
+  const { show } = useMUIContextMenu({
+    items: useMemo(
+      () => [
+        {
+          text: 'Settings',
+        },
+        { text: <Typography fontWeight='bold'>B</Typography> },
+        {
+          text: 'View',
+          children: [
+            {
+              text: 'Appearance',
+              children: [
+                {
+                  text: <FormContext />,
+                  highlight: false,
+                },
+              ],
+            },
+            { text: 'Notifications', children: [{ text: 'Email Alerts' }] },
+            {
+              text: 'Advanced',
+              children: [
+                {
+                  text: 'Diagrams',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      [],
+    ),
+    anchorRef: buttonAnchorEl,
+  });
+
+  return (
+    <Button
+      variant='contained'
+      ref={ref => {
+        setButtonAnchorEl(ref);
+      }}
+      onClick={() => {
+        show();
+      }}
+    >
+      Options
+    </Button>
+  );
+}
