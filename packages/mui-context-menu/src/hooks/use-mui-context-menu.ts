@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { MUIContextMenu } from '../context';
 import { BaseMenuItemProps, MenuAnchorRef, MenuItemProps, ShrunkMenuProps } from '../types';
 
@@ -18,24 +18,18 @@ export const useMUIContextMenu = ({
   const { setItems, setMenuAnchorRef, setMenuProps, setMenuItemProps } =
     useContext(MUIContextMenu);
 
-  useEffect(() => {
-    setItems(items);
-  }, [items]);
-
-  useEffect(() => {
-    if (menuProps) {
-      setMenuProps(menuProps);
-    }
-  }, [menuProps]);
-
-  useEffect(() => {
-    if (menuItemProps) {
-      setMenuItemProps(menuItemProps)
-    }
-  }, [menuItemProps]);
-
   return {
     show() {
+      setItems(items);
+
+      if (menuItemProps) {
+        setMenuItemProps(menuItemProps)
+      }
+
+      if (menuProps) {
+        setMenuProps(menuProps);
+      }
+
       setMenuAnchorRef(anchorRef);
     },
     hide() {
