@@ -1,5 +1,5 @@
 {
-  "version": "2.2.2",
+  "version": "2.2.3",
   "name": "@vladoavocado/mui-context-menu",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
