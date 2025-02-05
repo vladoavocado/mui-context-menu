@@ -135,6 +135,8 @@ export function Menu({
                   menuAnchorEl={openSubmenus[id]}
                   parentIndex={id}
                   onAddRef={onAddRef}
+                  menuItemProps={menuItemProps}
+                  menuProps={menuProps}
                   sx={{
                     pointerEvents: 'none',
 
