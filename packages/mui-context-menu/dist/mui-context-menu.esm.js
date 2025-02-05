@@ -11,17 +11,20 @@ var MUIContextMenu = /*#__PURE__*/createContext({
   setItems: noop,
   setMenuAnchorRef: noop,
   setMenuProps: noop,
+  setMenuItemProps: noop,
   menuAnchorEl: null
 });
 
 var useMUIContextMenu = function useMUIContextMenu(_ref) {
   var items = _ref.items,
     anchorRef = _ref.anchorRef,
-    menuProps = _ref.menuProps;
+    menuProps = _ref.menuProps,
+    menuItemProps = _ref.menuItemProps;
   var _useContext = useContext(MUIContextMenu),
     setItems = _useContext.setItems,
     setMenuAnchorRef = _useContext.setMenuAnchorRef,
-    setMenuProps = _useContext.setMenuProps;
+    setMenuProps = _useContext.setMenuProps,
+    setMenuItemProps = _useContext.setMenuItemProps;
   useEffect(function () {
     setItems(items);
   }, [items]);
@@ -30,6 +33,11 @@ var useMUIContextMenu = function useMUIContextMenu(_ref) {
       setMenuProps(menuProps);
     }
   }, [menuProps]);
+  useEffect(function () {
+    if (menuItemProps) {
+      setMenuItemProps(menuItemProps);
+    }
+  }, [menuItemProps]);
   return {
     show: function show() {
       setMenuAnchorRef(anchorRef);
@@ -69,6 +77,15 @@ function _extends() {
     return n;
   }, _extends.apply(null, arguments);
 }
+function _objectWithoutPropertiesLoose(r, e) {
+  if (null == r) return {};
+  var t = {};
+  for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
+    if (-1 !== e.indexOf(n)) continue;
+    t[n] = r[n];
+  }
+  return t;
+}
 
 function IconText(_ref) {
   var text = _ref.text,
@@ -93,6 +110,7 @@ function IconText(_ref) {
   }, startAdornment, createElement(Typography, Object.assign({}, textProps), text), endAdornment), hasChildren && createElement(ChevronRightIcon, null));
 }
 
+var _excluded = ["onMouseEnter", "onMouseLeave", "isHighlighted", "isTextComponent", "highlight", "children"];
 function MenuItem(_ref) {
   var onMouseEnter = _ref.onMouseEnter,
     onMouseLeave = _ref.onMouseLeave,
@@ -100,9 +118,13 @@ function MenuItem(_ref) {
     isTextComponent = _ref.isTextComponent,
     _ref$highlight = _ref.highlight,
     highlight = _ref$highlight === void 0 ? true : _ref$highlight,
-    children = _ref.children;
-  return createElement(Box, {
-    sx: function sx(_ref2) {
+    children = _ref.children,
+    props = _objectWithoutPropertiesLoose(_ref, _excluded);
+  console.log({
+    props: props
+  });
+  return createElement(Box, Object.assign({}, props, {
+    sx: [function (_ref2) {
       var palette = _ref2.palette;
       return {
         px: 2,
@@ -115,13 +137,13 @@ function MenuItem(_ref) {
           cursor: 'default'
         }
       };
-    },
+    }].concat(Array.isArray(props.sx) ? props.sx : [props.sx]),
     onClick: function onClick(event) {
       return event.preventDefault();
     },
     onMouseEnter: onMouseEnter,
     onMouseLeave: onMouseLeave
-  }, children);
+  }), children);
 }
 // event => openMenu(id, event)
 
@@ -132,6 +154,7 @@ function Menu(_ref) {
     onAddRef = _ref.onAddRef,
     menuProps = _ref.menuProps,
     menuAnchorEl = _ref.menuAnchorEl,
+    menuItemProps = _ref.menuItemProps,
     parentIndex = _ref.parentIndex,
     sx = _ref.sx;
   var _useState = useState({}),
@@ -194,20 +217,22 @@ function Menu(_ref) {
       startAdornment = _ref3.startAdornment,
       endAdornment = _ref3.endAdornment;
     var id = parentIndex + "-" + index;
-    return createElement(MenuItem, {
+    var onMouseEnter = function onMouseEnter(event) {
+      return openMenu(id, event);
+    };
+    var onMouseLeave = function onMouseLeave() {
+      if (openSubmenus[id] && children) {
+        closeMenu(id);
+      }
+    };
+    return createElement(MenuItem, Object.assign({}, menuItemProps, {
       key: id,
       highlight: highlight,
       isHighlighted: Boolean(openSubmenus[id] && items.length > 1),
       isTextComponent: typeof text === 'string',
-      onMouseEnter: function onMouseEnter(event) {
-        return openMenu(id, event);
-      },
-      onMouseLeave: function onMouseLeave() {
-        if (openSubmenus[id] && children) {
-          closeMenu(id);
-        }
-      }
-    }, createElement(IconText, {
+      onMouseEnter: onMouseEnter,
+      onMouseLeave: onMouseLeave
+    }), createElement(IconText, {
       text: text,
       hasChildren: ((_children$length = children == null ? void 0 : children.length) != null ? _children$length : 0) >= 1,
       textProps: textProps,
@@ -239,11 +264,15 @@ var withMUIContextMenuProvider = function withMUIContextMenuProvider(Component) 
     var _useState3 = useState(null),
       menuProps = _useState3[0],
       setMenuProps = _useState3[1];
+    var _useState4 = useState(null),
+      menuItemProps = _useState4[0],
+      setMenuItemProps = _useState4[1];
     var submenuRefs = useRef([]);
     var contextApi = useMemo(function () {
       return {
         setItems: setItems,
         setMenuAnchorRef: setMenuAnchorRef,
+        setMenuItemProps: setMenuItemProps,
         setMenuProps: setMenuProps,
         menuAnchorEl: menuAnchorEl
       };
@@ -258,6 +287,7 @@ var withMUIContextMenuProvider = function withMUIContextMenuProvider(Component) 
       parentIndex: '0',
       menuAnchorEl: menuAnchorEl,
       menuProps: menuProps,
+      menuItemProps: menuItemProps,
       onClose: function onClose() {
         return setMenuAnchorRef(null);
       },

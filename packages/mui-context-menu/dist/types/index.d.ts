@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import { TypographyProps, MenuProps as BaseMenuProps } from '@mui/material';
+import { BoxProps } from '@mui/material';
+export declare type BaseMenuItemProps = BoxProps;
 export declare type MenuItemProps = {
     text: string | ReactNode;
     textProps?: TypographyProps;

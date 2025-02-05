@@ -2922,7 +2922,7 @@
     react-dom "18.2.0"
 
 "@vladoavocado/mui-context-menu@*", "@vladoavocado/mui-context-menu@file:/Users/vladovacado/Projects/mui-context-menu/packages/mui-context-menu":
-  version "2.0.0"
+  version "2.1.0"
   resolved "file:packages/mui-context-menu"
 
 abab@^2.0.0:

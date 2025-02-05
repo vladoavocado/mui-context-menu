@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { MouseEventHandler, ReactNode } from 'react';
+import { BaseMenuItemProps } from '../../types';
 declare type MenuItemProps = {
     onMouseEnter: MouseEventHandler<HTMLElement>;
     onMouseLeave: MouseEventHandler<HTMLElement>;
@@ -7,6 +8,6 @@ declare type MenuItemProps = {
     isTextComponent?: boolean;
     highlight?: boolean;
     children?: ReactNode;
-};
-export declare function MenuItem({ onMouseEnter, onMouseLeave, isHighlighted, isTextComponent, highlight, children, }: MenuItemProps): React.JSX.Element;
+} & BaseMenuItemProps;
+export declare function MenuItem({ onMouseEnter, onMouseLeave, isHighlighted, isTextComponent, highlight, children, ...props }: MenuItemProps): React.JSX.Element;
 export {};
