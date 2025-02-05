@@ -126,9 +126,6 @@ function MenuItem(_ref) {
     highlight = _ref$highlight === void 0 ? true : _ref$highlight,
     children = _ref.children,
     props = _objectWithoutPropertiesLoose(_ref, _excluded);
-  console.log({
-    props: props
-  });
   return React.createElement(material.Box, Object.assign({}, props, {
     sx: [function (_ref2) {
       var palette = _ref2.palette;
@@ -144,9 +141,6 @@ function MenuItem(_ref) {
         }
       };
     }].concat(Array.isArray(props.sx) ? props.sx : [props.sx]),
-    onClick: function onClick(event) {
-      return event.preventDefault();
-    },
     onMouseEnter: onMouseEnter,
     onMouseLeave: onMouseLeave
   }), children);
@@ -193,8 +187,8 @@ function Menu(_ref) {
     open: Boolean(menuAnchorEl),
     anchorEl: menuAnchorEl,
     anchorOrigin: (_menuProps$anchorOrig = menuProps == null ? void 0 : menuProps.anchorOrigin) != null ? _menuProps$anchorOrig : {
-      vertical: 'top',
-      horizontal: 'left'
+      vertical: 'center',
+      horizontal: 'center'
     },
     transformOrigin: (_menuProps$transformO = menuProps == null ? void 0 : menuProps.transformOrigin) != null ? _menuProps$transformO : {
       vertical: 'top',
