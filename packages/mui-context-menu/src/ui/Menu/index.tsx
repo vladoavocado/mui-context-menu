@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useRef, useState, MouseEvent, MouseEventHandler } from 'react';
+import { useRef, useState, MouseEvent, MouseEventHandler, useEffect } from 'react';
 import { Menu as BaseMenu, SxProps } from '@mui/material';
 import { BaseMenuItemProps, MenuItemProps, ShrunkMenuProps } from '../../types';
 import { IconText } from '../IconText';
@@ -53,6 +53,12 @@ export function Menu({
       [id]: event!.currentTarget,
     });
   };
+
+  useEffect(() => {
+    if (!menuAnchorEl) {
+      setOpenSubmenus({});
+    }
+  }, [menuAnchorEl]);
 
   return (
     <BaseMenu
@@ -132,7 +138,7 @@ export function Menu({
               {children && (
                 <Menu
                   items={children}
-                  menuAnchorEl={menuAnchorEl ? openSubmenus[id] : undefined}
+                  menuAnchorEl={openSubmenus[id]}
                   parentIndex={id}
                   onAddRef={onAddRef}
                   menuItemProps={menuItemProps}

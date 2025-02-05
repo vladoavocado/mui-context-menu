@@ -11,7 +11,11 @@ import {
 import { useMUIContextMenu } from '@vladoavocado/mui-context-menu';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 
-function FormContext() {
+type FormContextProps = {
+  onClick?: () => void;
+}
+
+function FormContext({ onClick }: FormContextProps) {
   const [value, setValue] = useState('female');
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -30,6 +34,7 @@ function FormContext() {
         <FormControlLabel value='female' control={<Radio />} label='Female' />
         <FormControlLabel value='male' control={<Radio />} label='Male' />
       </RadioGroup>
+      <Button onClick={onClick}>Close me</Button>
     </FormControl>
   );
 }
@@ -39,7 +44,7 @@ export function ContextButton() {
     null,
   );
 
-  const { show } = useMUIContextMenu({
+  const { show, hide } = useMUIContextMenu({
     items: useMemo(
       () => [
         {
@@ -53,7 +58,7 @@ export function ContextButton() {
               text: 'Appearance',
               children: [
                 {
-                  text: <FormContext />,
+                  text: <FormContext onClick={() => hide()} />,
                   highlight: false,
                 },
               ],
