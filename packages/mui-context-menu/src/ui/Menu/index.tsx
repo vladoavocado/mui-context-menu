@@ -40,7 +40,7 @@ export function Menu({
       }));
 
       anchorTimeouts.current[id] = null;
-    }, 600);
+    }, 300);
   };
 
   const openMenu = (id: string, event: MouseEvent<HTMLElement>) => {
@@ -132,7 +132,7 @@ export function Menu({
               {children && (
                 <Menu
                   items={children}
-                  menuAnchorEl={openSubmenus[id]}
+                  menuAnchorEl={menuAnchorEl ? openSubmenus[id] : undefined}
                   parentIndex={id}
                   onAddRef={onAddRef}
                   menuItemProps={menuItemProps}
