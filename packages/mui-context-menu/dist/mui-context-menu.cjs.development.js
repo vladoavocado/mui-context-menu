@@ -178,6 +178,11 @@ function Menu(_ref) {
     }
     setOpenSubmenus((_setOpenSubmenus = {}, _setOpenSubmenus[id] = event.currentTarget, _setOpenSubmenus));
   };
+  React.useEffect(function () {
+    if (!menuAnchorEl) {
+      setOpenSubmenus({});
+    }
+  }, [menuAnchorEl]);
   return React.createElement(material.Menu, {
     ref: function ref(_ref2) {
       if (_ref2) {
@@ -240,7 +245,7 @@ function Menu(_ref) {
       endAdornment: endAdornment
     }), children && React.createElement(Menu, {
       items: children,
-      menuAnchorEl: menuAnchorEl ? openSubmenus[id] : undefined,
+      menuAnchorEl: openSubmenus[id],
       parentIndex: id,
       onAddRef: onAddRef,
       menuItemProps: menuItemProps,
