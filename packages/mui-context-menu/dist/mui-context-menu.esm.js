@@ -243,6 +243,8 @@ function Menu(_ref) {
       menuAnchorEl: openSubmenus[id],
       parentIndex: id,
       onAddRef: onAddRef,
+      menuItemProps: menuItemProps,
+      menuProps: menuProps,
       sx: {
         pointerEvents: 'none',
         '& .MuiMenuItem-root': {
