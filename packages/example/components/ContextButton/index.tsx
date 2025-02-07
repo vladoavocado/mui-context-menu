@@ -8,8 +8,8 @@ import {
   RadioGroup,
   Typography,
 } from '@mui/material';
-import { useMUIContextMenu } from '@vladoavocado/mui-context-menu';
-import { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import { useMUIContextMenu, useMuiContextMenuSettings } from '@vladoavocado/mui-context-menu';
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 type FormContextProps = {
   onClick?: () => void;
@@ -17,6 +17,11 @@ type FormContextProps = {
 
 function FormContext({ onClick }: FormContextProps) {
   const [value, setValue] = useState('female');
+  const { disableCloseOnOutsideClick } = useMuiContextMenuSettings();
+
+  useEffect(() => {
+    disableCloseOnOutsideClick(value === 'female')
+  }, [value]);
 
   const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
@@ -44,7 +49,7 @@ export function ContextButton() {
     null,
   );
 
-  const { show, hide } = useMUIContextMenu({
+  const { openMenu, closeMenu } = useMUIContextMenu({
     items: useMemo(
       () => [
         {
@@ -58,7 +63,7 @@ export function ContextButton() {
               text: 'Appearance',
               children: [
                 {
-                  text: <FormContext onClick={() => hide()} />,
+                  text: <FormContext onClick={() => closeMenu()} />,
                   highlight: false,
                 },
               ],
@@ -92,7 +97,7 @@ export function ContextButton() {
         setButtonAnchorEl(ref);
       }}
       onClick={() => {
-        show();
+        openMenu();
       }}
     >
       Options

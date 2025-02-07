@@ -1,6 +1,11 @@
 import { useContext } from 'react';
-import { MUIContextMenu } from '../context';
-import { BaseMenuItemProps, MenuAnchorRef, MenuItemProps, ShrunkMenuProps } from '../types';
+import { ContextMenuContext, ContextMenuContextValue } from '../context';
+import {
+  BaseMenuItemProps,
+  MenuAnchorRef,
+  MenuItemProps,
+  ShrunkMenuProps,
+} from '../types';
 
 export type MUIContextMenuHookProps = {
   items: MenuItemProps[];
@@ -14,26 +19,26 @@ export const useMUIContextMenu = ({
   anchorRef,
   menuProps,
   menuItemProps,
-}: MUIContextMenuHookProps) => {
-  const { setItems, setMenuAnchorRef, setMenuProps, setMenuItemProps } =
-    useContext(MUIContextMenu);
+}: MUIContextMenuHookProps): Omit<ContextMenuContextValue, 'openMenu'> & {
+  openMenu: () => void;
+} => {
+  const {
+    isOpen,
+    openMenu: baseOpenMenu,
+    closeMenu: baseCloseMenu,
+  } = useContext(ContextMenuContext);
 
   return {
-    show() {
-      setItems(items);
-
-      if (menuItemProps) {
-        setMenuItemProps(menuItemProps)
-      }
-
-      if (menuProps) {
-        setMenuProps(menuProps);
-      }
-
-      setMenuAnchorRef(anchorRef);
+    isOpen,
+    openMenu: () => {
+      baseOpenMenu({
+        anchor: anchorRef || null,
+        items,
+        menuProps,
+        itemProps: menuItemProps,
+      });
     },
-    hide() {
-      setMenuAnchorRef(null);
-    },
+    closeMenu: baseCloseMenu,
+    disableCloseOnOutsideClick: () => {},
   };
 };

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useMemo, useRef, useState } from 'react';
-import { MUIContextMenu } from '../context';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { ContextMenuOptions, ContextMenuContext } from '../context';
 import { Menu } from '../ui/Menu';
 import { MenuItemProps, ShrunkMenuProps, BaseMenuItemProps } from '../types';
 import { useClickOutside } from '../hooks';
@@ -12,40 +12,67 @@ export const withMUIContextMenuProvider = (
 ) =>
   function MUIContextMenuProvider(props: MUIContextMenuProviderProps) {
     const [items, setItems] = useState<MenuItemProps[]>([]);
-    const [menuAnchorEl, setMenuAnchorRef] = useState<HTMLElement | null>(null);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [menuProps, setMenuProps] = useState<ShrunkMenuProps | null>(null);
-    const [menuItemProps, setMenuItemProps] = useState<BaseMenuItemProps | null>(null);
+    const [itemProps, setItemProps] = useState<BaseMenuItemProps | null>(null);
+    const [disableOutsideClick, setDisableOutsideClick] =
+      useState<boolean>(false);
     const submenuRefs = useRef<HTMLElement[]>([]);
+
+    const openMenu = useCallback((options: ContextMenuOptions) => {
+      const {
+        anchor,
+        items: customItems,
+        menuProps: customMenuProps,
+        itemProps: customItemProps,
+        closeOnOutsideClick,
+      } = options;
+      setAnchorEl(anchor);
+      setItems(customItems);
+      setMenuProps(customMenuProps ?? null);
+      setItemProps(customItemProps ?? null);
+      setDisableOutsideClick(closeOnOutsideClick ?? false);
+    }, []);
+
+    const closeMenu = useCallback(() => {
+      setAnchorEl(null);
+    }, []);
+
+    const disableCloseOnOutsideClick = useCallback((isDisabled: boolean) => {
+      setDisableOutsideClick(isDisabled);
+    }, []);
 
     const contextApi = useMemo(
       () => ({
-        setItems,
-        setMenuAnchorRef,
-        setMenuItemProps,
-        setMenuProps,
-        menuAnchorEl,
+        closeMenu,
+        openMenu,
+        disableCloseOnOutsideClick,
+        isOpen: Boolean(anchorEl),
       }),
       [],
     );
 
-    useClickOutside(submenuRefs?.current, () => setMenuAnchorRef(null));
+    useClickOutside(
+      submenuRefs?.current,
+      disableOutsideClick ? () => {} : closeMenu,
+    );
 
     return (
-      <MUIContextMenu.Provider value={contextApi}>
+      <ContextMenuContext.Provider value={contextApi}>
         <Component {...props} />
         <Menu
           items={items}
           parentIndex='0'
-          menuAnchorEl={menuAnchorEl}
+          menuAnchorEl={anchorEl}
           menuProps={menuProps}
-          menuItemProps={menuItemProps}
-          onClose={() => setMenuAnchorRef(null)}
+          menuItemProps={itemProps}
+          onClose={closeMenu}
           onAddRef={(ref: HTMLElement) => {
             if (!submenuRefs.current.includes(ref)) {
               submenuRefs.current.push(ref);
             }
           }}
         />
-      </MUIContextMenu.Provider>
+      </ContextMenuContext.Provider>
     );
   };
