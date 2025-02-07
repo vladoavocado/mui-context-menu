@@ -11,5 +11,5 @@ declare type MenuProps = {
     onClose?: () => void;
     sx?: SxProps;
 };
-export declare function Menu({ items, onClose, onAddRef, menuProps, menuAnchorEl, menuItemProps, parentIndex, sx, }: MenuProps): React.JSX.Element;
+export declare function Menu({ items, onAddRef, menuProps, menuAnchorEl, menuItemProps, parentIndex, sx, }: MenuProps): React.JSX.Element;
 export {};

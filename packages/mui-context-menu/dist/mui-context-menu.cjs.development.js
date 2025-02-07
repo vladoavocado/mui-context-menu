@@ -144,7 +144,6 @@ function MenuItem(_ref) {
 function Menu(_ref) {
   var _menuProps$anchorOrig, _menuProps$transformO;
   var items = _ref.items,
-    onClose = _ref.onClose,
     onAddRef = _ref.onAddRef,
     menuProps = _ref.menuProps,
     menuAnchorEl = _ref.menuAnchorEl,
@@ -166,6 +165,9 @@ function Menu(_ref) {
   };
   var openMenu = function openMenu(id, event) {
     var _setOpenSubmenus;
+    if (openSubmenus[id]) {
+      setOpenSubmenus({});
+    }
     if (anchorTimeouts.current[id]) {
       clearTimeout(anchorTimeouts.current[id]);
       anchorTimeouts.current[id] = null;
@@ -201,12 +203,7 @@ function Menu(_ref) {
       }
     }, sx),
     disableAutoFocus: true,
-    disableEnforceFocus: true,
-    onMouseLeave: function onMouseLeave() {
-      if (!openSubmenus[parentIndex]) {
-        onClose == null || onClose();
-      }
-    }
+    disableEnforceFocus: true
   }, items.map(function (_ref3, index) {
     var _children$length;
     var text = _ref3.text,
@@ -220,6 +217,9 @@ function Menu(_ref) {
       return openMenu(id, event);
     };
     var onMouseLeave = function onMouseLeave() {
+      if (openSubmenus[id]) {
+        return;
+      }
       if (openSubmenus[id] && children) {
         closeMenu(id);
       }
