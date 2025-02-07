@@ -18,7 +18,7 @@ type MenuProps = {
 
 export function Menu({
   items,
-  onClose,
+  // onClose,
   onAddRef,
   menuProps,
   menuAnchorEl,
@@ -44,6 +44,10 @@ export function Menu({
   };
 
   const openMenu = (id: string, event: MouseEvent<HTMLElement>) => {
+    if (openSubmenus[id]) {
+      setOpenSubmenus({});
+    }
+
     if (anchorTimeouts.current[id]) {
       clearTimeout(anchorTimeouts.current[id]!);
       anchorTimeouts.current[id] = null;
@@ -92,11 +96,6 @@ export function Menu({
       }}
       disableAutoFocus
       disableEnforceFocus
-      onMouseLeave={() => {
-        if (!openSubmenus[parentIndex]) {
-          onClose?.();
-        }
-      }}
     >
       {items.map(
         (
@@ -113,6 +112,10 @@ export function Menu({
           const id = `${parentIndex}-${index}`;
           const onMouseEnter: MouseEventHandler<HTMLElement> = (event) => openMenu(id, event);
           const onMouseLeave: MouseEventHandler<HTMLElement> = () => {
+            if (openSubmenus[id]) {
+              return;
+            }
+
             if (openSubmenus[id] && children) {
               closeMenu(id);
             }
