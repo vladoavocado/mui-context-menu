@@ -1,18 +1,17 @@
-import { createContext, useContext, useEffect, createElement, Fragment, useState, useRef, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo, createElement, Fragment, useState, useRef, useCallback } from 'react';
 import { Stack, Typography, Box, Menu as Menu$1 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { alpha } from '@mui/material/styles';
 
-function noop() {
-  // eslint-disable-next-line no-console
-  console.info("Possibly you forgot to wrap your component with MUIContextMenuProvider.");
-}
-var MUIContextMenu = /*#__PURE__*/createContext({
-  setItems: noop,
-  setMenuAnchorRef: noop,
-  setMenuProps: noop,
-  setMenuItemProps: noop,
-  menuAnchorEl: null
+// file: packages/mui-context-menu/src/context/ContextMenuContext.ts
+var noop = function noop() {
+  console.info('Context menu is not initialized. Please wrap your component in <ContextMenuProvider>.');
+};
+var ContextMenuContext = /*#__PURE__*/createContext({
+  openMenu: noop,
+  closeMenu: noop,
+  disableCloseOnOutsideClick: noop,
+  isOpen: false
 });
 
 var useMUIContextMenu = function useMUIContextMenu(_ref) {
@@ -20,25 +19,22 @@ var useMUIContextMenu = function useMUIContextMenu(_ref) {
     anchorRef = _ref.anchorRef,
     menuProps = _ref.menuProps,
     menuItemProps = _ref.menuItemProps;
-  var _useContext = useContext(MUIContextMenu),
-    setItems = _useContext.setItems,
-    setMenuAnchorRef = _useContext.setMenuAnchorRef,
-    setMenuProps = _useContext.setMenuProps,
-    setMenuItemProps = _useContext.setMenuItemProps;
+  var _useContext = useContext(ContextMenuContext),
+    isOpen = _useContext.isOpen,
+    baseOpenMenu = _useContext.openMenu,
+    baseCloseMenu = _useContext.closeMenu;
   return {
-    show: function show() {
-      setItems(items);
-      if (menuItemProps) {
-        setMenuItemProps(menuItemProps);
-      }
-      if (menuProps) {
-        setMenuProps(menuProps);
-      }
-      setMenuAnchorRef(anchorRef);
+    isOpen: isOpen,
+    openMenu: function openMenu() {
+      baseOpenMenu({
+        anchor: anchorRef || null,
+        items: items,
+        menuProps: menuProps,
+        itemProps: menuItemProps
+      });
     },
-    hide: function hide() {
-      setMenuAnchorRef(null);
-    }
+    closeMenu: baseCloseMenu,
+    disableCloseOnOutsideClick: function disableCloseOnOutsideClick() {}
   };
 };
 
@@ -60,6 +56,20 @@ var useClickOutside = function useClickOutside(anchors, onClose) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [anchors, onClose]);
+};
+
+var useMuiContextMenuSettings = function useMuiContextMenuSettings() {
+  var _useContext = useContext(ContextMenuContext),
+    disableCloseOnOutsideClick = _useContext.disableCloseOnOutsideClick,
+    closeMenu = _useContext.closeMenu,
+    isOpen = _useContext.isOpen;
+  return useMemo(function () {
+    return {
+      disableCloseOnOutsideClick: disableCloseOnOutsideClick,
+      closeMenu: closeMenu,
+      isOpen: isOpen
+    };
+  }, [disableCloseOnOutsideClick, isOpen]);
 };
 
 function _extends() {
@@ -254,38 +264,54 @@ var withMUIContextMenuProvider = function withMUIContextMenuProvider(Component) 
       items = _useState[0],
       setItems = _useState[1];
     var _useState2 = useState(null),
-      menuAnchorEl = _useState2[0],
-      setMenuAnchorRef = _useState2[1];
+      anchorEl = _useState2[0],
+      setAnchorEl = _useState2[1];
     var _useState3 = useState(null),
       menuProps = _useState3[0],
       setMenuProps = _useState3[1];
     var _useState4 = useState(null),
-      menuItemProps = _useState4[0],
-      setMenuItemProps = _useState4[1];
+      itemProps = _useState4[0],
+      setItemProps = _useState4[1];
+    var _useState5 = useState(false),
+      disableOutsideClick = _useState5[0],
+      setDisableOutsideClick = _useState5[1];
     var submenuRefs = useRef([]);
+    var openMenu = useCallback(function (options) {
+      var anchor = options.anchor,
+        customItems = options.items,
+        customMenuProps = options.menuProps,
+        customItemProps = options.itemProps,
+        closeOnOutsideClick = options.closeOnOutsideClick;
+      setAnchorEl(anchor);
+      setItems(customItems);
+      setMenuProps(customMenuProps != null ? customMenuProps : null);
+      setItemProps(customItemProps != null ? customItemProps : null);
+      setDisableOutsideClick(closeOnOutsideClick != null ? closeOnOutsideClick : false);
+    }, []);
+    var closeMenu = useCallback(function () {
+      setAnchorEl(null);
+    }, []);
+    var disableCloseOnOutsideClick = useCallback(function (isDisabled) {
+      setDisableOutsideClick(isDisabled);
+    }, []);
     var contextApi = useMemo(function () {
       return {
-        setItems: setItems,
-        setMenuAnchorRef: setMenuAnchorRef,
-        setMenuItemProps: setMenuItemProps,
-        setMenuProps: setMenuProps,
-        menuAnchorEl: menuAnchorEl
+        closeMenu: closeMenu,
+        openMenu: openMenu,
+        disableCloseOnOutsideClick: disableCloseOnOutsideClick,
+        isOpen: Boolean(anchorEl)
       };
     }, []);
-    useClickOutside(submenuRefs == null ? void 0 : submenuRefs.current, function () {
-      return setMenuAnchorRef(null);
-    });
-    return createElement(MUIContextMenu.Provider, {
+    useClickOutside(submenuRefs == null ? void 0 : submenuRefs.current, disableOutsideClick ? function () {} : closeMenu);
+    return createElement(ContextMenuContext.Provider, {
       value: contextApi
     }, createElement(Component, Object.assign({}, props)), createElement(Menu, {
       items: items,
       parentIndex: '0',
-      menuAnchorEl: menuAnchorEl,
+      menuAnchorEl: anchorEl,
       menuProps: menuProps,
-      menuItemProps: menuItemProps,
-      onClose: function onClose() {
-        return setMenuAnchorRef(null);
-      },
+      menuItemProps: itemProps,
+      onClose: closeMenu,
       onAddRef: function onAddRef(ref) {
         if (!submenuRefs.current.includes(ref)) {
           submenuRefs.current.push(ref);
@@ -295,5 +321,5 @@ var withMUIContextMenuProvider = function withMUIContextMenuProvider(Component) 
   };
 };
 
-export { useMUIContextMenu, withMUIContextMenuProvider };
+export { useMUIContextMenu, useMuiContextMenuSettings, withMUIContextMenuProvider };
 //# sourceMappingURL=mui-context-menu.esm.js.map
